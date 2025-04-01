@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package delivery;
+
+service DeliveryService{
+    rpc CreateDelivery(CreateDeliveryDto) returns (Delivery){}
+    rpc FindAllDeliveries(Empty) returns (DeliveryList){}
+    rpc FindDeliveryById(FineOneDeliveryDto) returns (Delivery){}
+    rpc UpdateDelivery(UpdateDeliveryDto) returns (Delivery){}
+    rpc DeleteDelivery(FineOneDeliveryDto) returns (Delivery){}
+}
+message Empty {}
+message DeliveryList{
+    repeated Delivery deliveries = 1;
+}
+message FineOneDeliveryDto{
+    string id = 1;
+}
+message CreateDeliveryDto{
+    string id = 1;
+    string orderId = 2;
+    string address = 3;
+    string status = 4;
+}
+message UpdateDeliveryDto{
+    string id = 1;
+    string orderId = 2;
+    string address = 3;
+    string status = 4;
+}
+message Delivery{
+    string id = 1;
+    string orderId = 2;
+    string address = 3;
+    string status = 4;
+}
+message DeliveryStatus{
+    string id = 1;
+    string status = 2;
+}
