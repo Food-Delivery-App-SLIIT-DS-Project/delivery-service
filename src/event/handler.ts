@@ -18,39 +18,53 @@ export class DeliveryKafkaHandler {
   }
 
   @EventPattern('ORDER_ACCEPTED')
-async handleOrderAccepted(@Payload() data: any) {
-  console.log('📦 Received ORDER_ACCEPTED payload:', data);
+  async handleOrderAccepted(@Payload() data: any) {
+    console.log('📦 Received ORDER_ACCEPTED payload:', data);
 
-  const location = data?.location;
-  const orderId = data?.orderId;
+    const location = data?.location;
+    const orderId = data?.orderId;
 
-  if (!location) {
-    console.warn('❌ Invalid or missing location data:', data);
-    return; // ⬅️ Don't crash! Just return to acknowledge the message
-  }
-
-  const { lat, lng } = location;
-  const radius = 500;
-
-  try {
-    const nearbyDelivery = await this.deliveryService.findNearest(lat, lng, radius);
-
-    console.log('🛵 Nearby Delivery People:', nearbyDelivery);
-    if (!nearbyDelivery?.length) {
-      console.warn('No available riders nearby');
-      return;
+    if (!location) {
+      console.warn('❌ Invalid or missing location data:', data);
+      return; // ⬅️ Don't crash! Just return to acknowledge the message
     }
 
-    const selectedRider = nearbyDelivery[0];
+    const { lat, lng } = location;
+    const radius = 500;
 
-    await this.kafkaClient.emit('DELIVERY_ASSIGNED', {
-      userId: selectedRider.userId,
-      orderId,
-      pickupLocation: location,
-    });
-  } catch (err) {
-    console.error('🚨 Failed to handle order accepted:', err);
-    // Optionally rethrow: throw err
+    try {
+      const nearbyDelivery = await this.deliveryService.findNearest(
+        lat,
+        lng,
+        radius,
+      );
+
+      console.log('🛵 Nearby Delivery People:', nearbyDelivery);
+      if (!nearbyDelivery?.length) {
+        console.warn('No available riders nearby');
+        return;
+      }
+
+      const selectedRider = nearbyDelivery[0];
+      const dataFormate = {
+        data: {
+          token:
+            'dfK2ZliHQE-GjkWeJWxXFh:APA91bEyyY8qHBLmtI188npTY-t5VSkyDi_oMTUsjjx0rx5cuqmjHk7_mvUr8Nmm6cY1XSr16zpiGrIyXj6ri1Rm8uLRZ-bL38L7teFoNrnJJIKexUz_PcU',
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          orderId: orderId,
+          customerName: 'Mash',
+          address: 'Kolonnawa',
+          total: '$7.50',
+          pickupLocation: {
+            lat: lat,
+            lng: lng,
+          },
+        },
+      };
+      await this.kafkaClient.emit('DELIVERY_ASSIGNED', dataFormate);
+    } catch (err) {
+      console.error('🚨 Failed to handle order accepted:', err);
+      // Optionally rethrow: throw err
+    }
   }
-}
 }
