@@ -13,7 +13,9 @@ export class DeliveryKafkaHandler {
   constructor(
     private readonly deliveryService: DeliveryService,
     @Inject('KAFKA_SERVICE_DELIVERY') private readonly kafkaClient: ClientKafka,
-  ) {}
+  ) {
+    console.log('DeliveryKafkaHandler initialized');
+  }
 
   @EventPattern('ORDER_ACCEPTED')
 async handleOrderAccepted(@Payload() data: any) {

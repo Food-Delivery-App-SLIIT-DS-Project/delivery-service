@@ -6,8 +6,8 @@ import {
   DeliveryPerson,
   DeliveryPersonSchema,
 } from 'src/schema/delivery-person.schema';
-import { DeliveryKafkaHandler } from 'src/event/handler';
 import { KafkaModule } from 'src/kafka/kafka.module';
+import { DeliveryKafkaHandler } from 'src/event/handler';
 
 @Module({
   imports: [

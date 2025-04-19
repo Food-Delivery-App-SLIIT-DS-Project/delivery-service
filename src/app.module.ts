@@ -3,11 +3,13 @@ import { ConfigModule } from '@nestjs/config';
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { DeliveryModule } from 'delivery/delivery.module';
+import { DeliveryModule } from './delivery/delivery.module';
+import { KafkaModule } from './kafka/kafka.module';
 
 @Module({
   imports: [
     DeliveryModule,
+    KafkaModule,
     ConfigModule.forRoot(),
     MongooseModule.forRoot(
       process.env.MONGO_URI || 'mongodb://localhost:27017/default-db',
