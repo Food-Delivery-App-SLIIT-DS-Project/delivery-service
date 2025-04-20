@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { DeliveryModule } from 'delivery/delivery.module';
+import { DeliveryModule } from 'src/delivery/delivery.module';
 
 @Module({
   imports: [

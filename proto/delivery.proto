@@ -1,40 +1,46 @@
 syntax = "proto3";
-
 package delivery;
 
 service DeliveryService{
-    rpc CreateDelivery(CreateDeliveryDto) returns (Delivery){}
-    rpc FindAllDeliveries(Empty) returns (DeliveryList){}
-    rpc FindDeliveryById(FineOneDeliveryDto) returns (Delivery){}
-    rpc UpdateDelivery(UpdateDeliveryDto) returns (Delivery){}
-    rpc DeleteDelivery(FineOneDeliveryDto) returns (Delivery){}
+
+    //delivery assignment management
+    rpc CreateDelivery(CreateDeliveryDto) returns (Delivery){} // delivery/assign
+    rpc FindAllDeliveries(Empty2) returns (DeliveryList){}
+    rpc FindDeliveryById(FindOneDeliveryDto) returns (Delivery){}
+    rpc UpdateDeliveryStatus(UpdateDeliveryStatusDto) returns (Delivery){}
 }
-message Empty {}
+
+message Empty2 {}
+
+
+message Delivery{
+    string deliveryId = 1;
+    string orderId = 2;
+    string address = 3;
+    string trackingId = 4;
+    string status = 5;
+    string createdAt = 6;
+    string updatedAt = 7;
+}
+
+message CreateDeliveryDto{
+    string orderId = 1;
+    string address = 2;
+    string trackingId = 3;
+    string status = 4;
+    string createdAt = 5;
+    string updatedAt = 6;
+}
+
 message DeliveryList{
     repeated Delivery deliveries = 1;
 }
-message FineOneDeliveryDto{
-    string id = 1;
+
+message FindOneDeliveryDto{
+    string deliveryId = 1;
 }
-message CreateDeliveryDto{
-    string id = 1;
-    string orderId = 2;
-    string address = 3;
-    string status = 4;
-}
-message UpdateDeliveryDto{
-    string id = 1;
-    string orderId = 2;
-    string address = 3;
-    string status = 4;
-}
-message Delivery{
-    string id = 1;
-    string orderId = 2;
-    string address = 3;
-    string status = 4;
-}
-message DeliveryStatus{
-    string id = 1;
+
+message UpdateDeliveryStatusDto{
+    string deliveryId = 1;
     string status = 2;
 }
