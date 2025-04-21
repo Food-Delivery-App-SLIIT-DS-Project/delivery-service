@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { DeliveryController } from './delivery.controller';
-import { DeliveryService } from './delivery.service';
+import { DeliveryController } from './controller/delivery.controller';
+import { DeliveryService } from './service/delivery.service';
 import {
   DeliveryPerson,
   DeliveryPersonSchema,

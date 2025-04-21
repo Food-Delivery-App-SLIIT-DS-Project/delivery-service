@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ClientKafka, EventPattern, Payload } from '@nestjs/microservices';
 import { Controller, Inject } from '@nestjs/common';
-import { DeliveryService } from 'src/delivery/delivery.service';
+import { DeliveryService } from 'src/delivery/service/delivery.service';
 
 @Controller()
 export class DeliveryKafkaHandler {
