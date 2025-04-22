@@ -5,9 +5,11 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DeliveryModule } from './delivery/delivery.module';
 import { KafkaModule } from './kafka/kafka.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
+    RedisModule,
     DeliveryModule,
     KafkaModule,
     ConfigModule.forRoot(),

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { RedisService } from 'src/redis/redis.service';
 import {
   DeliveryPerson,
   DeliveryPersonDocument,
@@ -11,10 +12,11 @@ export class DeliveryService {
   constructor(
     @InjectModel(DeliveryPerson.name)
     private readonly deliveryModel: Model<DeliveryPersonDocument>,
+    private readonly redisService: RedisService, // <-- Injected here
   ) {}
 
   async goOnline(userId: string, coordinates: [number, number]) {
-    return this.deliveryModel.findOneAndUpdate(
+    const updated = await this.deliveryModel.findOneAndUpdate(
       { userId },
       {
         isOnline: true,
@@ -25,18 +27,36 @@ export class DeliveryService {
       },
       { upsert: true, new: true },
     );
+
+    this.redisService.publish('driver.location.updated', {
+      userId,
+      isOnline: true,
+      location: {
+        type: 'Point',
+        coordinates,
+      },
+    });
+
+    return updated;
   }
 
   async goOffline(userId: string) {
-    return this.deliveryModel.findOneAndUpdate(
+    const updated = await this.deliveryModel.findOneAndUpdate(
       { userId },
       { isOnline: false },
       { new: true },
     );
+
+    this.redisService.publish('driver.location.updated', {
+      userId,
+      isOnline: false,
+    });
+
+    return updated;
   }
 
   async updateLocation(userId: string, coordinates: [number, number]) {
-    return this.deliveryModel.findOneAndUpdate(
+    const updated = await this.deliveryModel.findOneAndUpdate(
       { userId },
       {
         location: {
@@ -46,6 +66,17 @@ export class DeliveryService {
       },
       { new: true },
     );
+
+    this.redisService.publish('driver.location.updated', {
+      userId,
+      isOnline: updated?.isOnline ?? false,
+      location: {
+        type: 'Point',
+        coordinates,
+      },
+    });
+
+    return updated;
   }
 
   async findNearest(lat: number, lng: number, maxDistanceInMeters = 5000) {

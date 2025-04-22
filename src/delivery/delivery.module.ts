@@ -11,9 +11,12 @@ import { DeliveryKafkaHandler } from 'src/event/handler';
 import { VehicleController } from './controller/vehicle.controller';
 import { VehicleService } from './service/vehicle.service';
 import { Vehicle, VehicleSchema } from 'src/schema/vehicle.schema';
+import { RedisService } from 'src/redis/redis.service';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
+    RedisModule,
     KafkaModule,
     MongooseModule.forFeature([
       { name: DeliveryPerson.name, schema: DeliveryPersonSchema },

@@ -3,9 +3,15 @@ import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { DELIVERY_PACKAGE_NAME } from './types';
+import { RedisService } from './redis/redis.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Initialize Redis service
+  const redisService = app.get(RedisService);
+  await redisService.onModuleInit();
+
 
   //  gRPC microservice
   app.connectMicroservice<MicroserviceOptions>({
@@ -37,6 +43,6 @@ async function bootstrap() {
 
   // Start both transports
   await app.startAllMicroservices();
-  console.log('✅ gRPC and Kafka microservices running on Delivery Service');
+  console.log('✅ GRPC , KAFKA AND REDIS MICROSERVICES READY');
 }
 void bootstrap();
