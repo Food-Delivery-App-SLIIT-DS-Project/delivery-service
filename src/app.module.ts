@@ -10,7 +10,7 @@ import { KafkaModule } from './kafka/kafka.module';
   imports: [
     DeliveryModule,
     KafkaModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(
       process.env.MONGO_URI || 'mongodb://localhost:27017/default-db',
     ),
