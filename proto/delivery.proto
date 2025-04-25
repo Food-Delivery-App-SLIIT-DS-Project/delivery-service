@@ -34,8 +34,11 @@ message GetNearestRequest {
 message DeliveryStatusResponse {
   string userId = 1;
   bool isOnline = 2;
-  string message = 3;
+// coordinates of the delivery person
+repeated double coordinates = 3;
+  string message = 4;
 }
+
 
 message NearestDelivery {
   string userId = 1;

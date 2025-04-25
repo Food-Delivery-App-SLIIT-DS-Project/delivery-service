@@ -48,6 +48,7 @@ export class DeliveryController implements DeliveryServiceController {
       map((res) => ({
         userId: res?.userId ?? '',
         isOnline: res?.isOnline ?? false,
+        coordinates: res?.location?.coordinates ?? [],
         message: 'Location updated',
       })),
     );

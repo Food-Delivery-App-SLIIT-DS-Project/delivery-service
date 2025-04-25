@@ -35,6 +35,7 @@ export interface GetNearestRequest {
 export interface DeliveryStatusResponse {
   userId: string;
   isOnline: boolean;
+  coordinates?: number[];
   message: string;
 }
 

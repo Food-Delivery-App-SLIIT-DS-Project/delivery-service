@@ -71,6 +71,7 @@ export class DeliveryService {
 
   // Go Offline
   async goOffline(userId: string) {
+    console.log('Go offline:', userId);
     try {
       const updated = await this.deliveryModel.findOneAndUpdate(
         { userId },
@@ -122,7 +123,7 @@ export class DeliveryService {
           coordinates,
         },
       });
-
+      // console.log('Location updated:', updated);
       return updated;
     } catch (error) {
       console.error('Failed to update location:', error);
