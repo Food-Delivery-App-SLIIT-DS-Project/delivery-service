@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 export type DeliveryPersonDocument = DeliveryPerson & Document;
@@ -11,20 +11,22 @@ export class DeliveryPerson {
   @Prop({ default: false })
   isOnline: boolean;
 
-  @Prop({
-    type: {
-      type: String,
-      enum: ['Point'],
-      default: 'Point',
-    },
-    coordinates: {
-      type: [Number], // [longitude, latitude]
-      index: '2dsphere',
-    },
-  })
+  @Prop(
+    raw({
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point',
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        index: '2dsphere',
+      },
+    }),
+  )
   location: {
-    type: string;
-    coordinates: number[];
+    type: 'Point';
+    coordinates: [number, number];
   };
 }
 

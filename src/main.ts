@@ -5,16 +5,20 @@ import { join } from 'path';
 import { DELIVERY_PACKAGE_NAME } from './types';
 import { VEHICLE_PACKAGE_NAME } from './types/vehicle';
 import { ConfigModule } from '@nestjs/config';
+import { RedisService } from './redis/redis.service';
 
 async function bootstrap() {
   // Load environment variables
-  void ConfigModule.forRoot({
-    isGlobal: true,
-  });
+  void ConfigModule.forRoot({ isGlobal: true });
+
   const app = await NestFactory.create(AppModule);
   const url = process.env.DELIVERY_SERVICE_URL || 'localhost:50053';
   // const protoPath =
   //   process.env.GRPC_PROTO_PATH || join(__dirname, '../proto/delivery.proto');
+
+  // init the redis ------------------
+  const redisService = app.get(RedisService);
+  redisService.onModuleInit();
 
   //  gRPC microservice
   app.connectMicroservice<MicroserviceOptions>({

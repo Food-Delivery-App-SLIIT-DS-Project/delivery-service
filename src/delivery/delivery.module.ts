@@ -8,6 +8,7 @@ import {
 } from 'src/schema/delivery-person.schema';
 import { KafkaModule } from 'src/kafka/kafka.module';
 import { DeliveryKafkaHandler } from 'src/event/handler';
+import { RedisService } from 'src/redis/redis.service';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { DeliveryKafkaHandler } from 'src/event/handler';
     ]),
   ],
   controllers: [DeliveryController, DeliveryKafkaHandler],
-  providers: [DeliveryService],
+  providers: [DeliveryService, RedisService],
   exports: [DeliveryService],
 })
 export class DeliveryModule {}
