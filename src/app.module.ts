@@ -5,6 +5,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DeliveryModule } from './delivery/delivery.module';
 import { KafkaModule } from './kafka/kafka.module';
+import { VehicleModule } from './vehicle/vehicle.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { KafkaModule } from './kafka/kafka.module';
     MongooseModule.forRoot(
       process.env.MONGO_URI || 'mongodb://localhost:27017/default-db',
     ),
+    VehicleModule,
   ],
   controllers: [],
   providers: [],
