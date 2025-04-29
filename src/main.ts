@@ -1,22 +1,55 @@
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
+import { DELIVERY_PACKAGE_NAME } from './types';
+import { VEHICLE_PACKAGE_NAME } from './types/vehicle';
+import { ConfigModule } from '@nestjs/config';
+import { RedisService } from './redis/redis.service';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AppModule,
-    {
-      transport: Transport.GRPC,
-      options: {
-        protoPath: join(__dirname, '../delivery.proto'),
-        package: 'delivery',
-        url: 'localhost:50053',
+  // Load environment variables
+  void ConfigModule.forRoot({ isGlobal: true });
+
+  const app = await NestFactory.create(AppModule);
+  const url = process.env.DELIVERY_SERVICE_URL || 'localhost:50053';
+  // const protoPath =
+  //   process.env.GRPC_PROTO_PATH || join(__dirname, '../proto/delivery.proto');
+
+  // init the redis ------------------
+  const redisService = app.get(RedisService);
+  redisService.onModuleInit();
+
+  //  gRPC microservice
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.GRPC,
+    options: {
+      protoPath: [
+        join(__dirname, '../proto/delivery.proto'),
+        join(__dirname, '../proto/vehicle.proto'),
+      ],
+      package: [DELIVERY_PACKAGE_NAME, VEHICLE_PACKAGE_NAME],
+      url: url,
+    },
+  });
+  // console.log(`gRPC microservice running on ${url}`);
+  // Kafka microservice
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.KAFKA,
+    options: {
+      client: {
+        brokers: [process.env.KAFKA_BROKER || 'localhost:9092'],
+      },
+      consumer: {
+        groupId: 'delivery-consumer',
       },
     },
-  );
+  });
+
   app.enableShutdownHooks();
-  await app.listen();
-  console.log('Delivery service is running on: http://localhost:50053');
+
+  // Start both transports
+  await app.startAllMicroservices();
+  console.log('✅ gRPC and Kafka microservices running on Delivery Service');
 }
 void bootstrap();

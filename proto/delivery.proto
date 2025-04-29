@@ -2,39 +2,50 @@ syntax = "proto3";
 
 package delivery;
 
-service DeliveryService{
-    rpc CreateDelivery(CreateDeliveryDto) returns (Delivery){}
-    rpc FindAllDeliveries(Empty) returns (DeliveryList){}
-    rpc FindDeliveryById(FineOneDeliveryDto) returns (Delivery){}
-    rpc UpdateDelivery(UpdateDeliveryDto) returns (Delivery){}
-    rpc DeleteDelivery(FineOneDeliveryDto) returns (Delivery){}
+service DeliveryService {
+  rpc GoOnline(OnlineStatusRequest) returns (DeliveryStatusResponse);
+  rpc GoOffline(OfflineStatusRequest) returns (DeliveryStatusResponse);
+  rpc UpdateLocation(UpdateLocationRequest) returns (DeliveryStatusResponse);
+  rpc GetNearest(GetNearestRequest) returns (NearestDeliveryList);
 }
-message Empty {}
-message DeliveryList{
-    repeated Delivery deliveries = 1;
+
+message OnlineStatusRequest {
+  string userId = 1;
+  double lat = 2;
+  double lng = 3;
 }
-message FineOneDeliveryDto{
-    string id = 1;
+
+message OfflineStatusRequest {
+  string userId = 1;
 }
-message CreateDeliveryDto{
-    string id = 1;
-    string orderId = 2;
-    string address = 3;
-    string status = 4;
+
+message UpdateLocationRequest {
+  string userId = 1;
+  double lat = 2;
+  double lng = 3;
 }
-message UpdateDeliveryDto{
-    string id = 1;
-    string orderId = 2;
-    string address = 3;
-    string status = 4;
+
+message GetNearestRequest {
+  double lat = 1;
+  double lng = 2;
+  double radius = 3;
 }
-message Delivery{
-    string id = 1;
-    string orderId = 2;
-    string address = 3;
-    string status = 4;
+
+message DeliveryStatusResponse {
+  string userId = 1;
+  bool isOnline = 2;
+// coordinates of the delivery person
+repeated double coordinates = 3;
+  string message = 4;
 }
-message DeliveryStatus{
-    string id = 1;
-    string status = 2;
+
+
+message NearestDelivery {
+  string userId = 1;
+  double lat = 2;
+  double lng = 3;
+}
+
+message NearestDeliveryList {
+  repeated NearestDelivery list = 1;
 }

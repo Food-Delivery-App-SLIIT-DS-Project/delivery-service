@@ -1,0 +1,81 @@
+syntax = "proto3";
+package vehicle;
+
+service VehicleService{ 
+    //delivery vechile management
+    rpc CreateVehicle(CreateVehicleDto) returns (Vehicle){}
+    rpc FindVehicleById(FindOneVehicleDto) returns (Vehicle){}
+    rpc FindAllVehicles(Empty2) returns (VehicleList){}
+    rpc DeleteVehicle(FindOneVehicleDto) returns (Vehicle){}
+    rpc FindVehicleByDriverId(FindVehicleByDriverIdDto) returns (Vehicle){}
+
+    // find available vehicles
+    rpc FindAvailableVehicles(Empty2) returns (VehicleList){}
+    rpc UpdateVehicleAvailability(UpdateVehicleAvailabilityDto) returns (Vehicle){}
+
+    //vehicle location
+    rpc UpdateVehicleLocation(VehicleLocation) returns (VehicleLocation){}
+    rpc FindVehicleLocation(FindOneVehicleDto) returns (VehicleLocation){}
+    rpc FindAllVehicleLocations(Empty2) returns (VehicleLocation){}
+    rpc DeleteVehicleLocation(FindOneVehicleDto) returns (VehicleLocation){}
+}
+
+message Empty2 {}
+  
+message Vehicle{
+    string vehicleId = 1; 
+    string driverId = 2;
+    string vehicleType = 3;
+    string brandName = 4;
+    string modelName = 5;
+    string registrationNumber = 6;
+    string color = 7;
+    int32 year = 8;
+    string insuranceNumber = 9;
+    string insuranceExpiry = 10;
+    bool availability = 11;
+    string createdAt = 12;
+    string updatedAt = 13;
+}
+
+message CreateVehicleDto {
+    string driverId = 1;
+    string vehicleType = 2;
+    string brandName = 3;
+    string modelName = 4;
+    string registrationNumber = 5;
+    string color = 6;
+    int32 year = 7;
+    string insuranceNumber = 8;
+    string insuranceExpiry = 9;
+}
+
+
+message VehicleList{
+    repeated Vehicle vehicles = 1;
+}
+
+message FindVehicleByDriverIdDto{
+    string driverId = 1;
+}
+
+message FindOneVehicleDto{
+    string vehicleId = 1;
+}
+
+message UpdateVehicleAvailabilityDto {
+    string vehicleId = 1;
+    bool availability = 2;
+}
+
+message VehicleLocation{
+    string trackingId = 1;
+    string vehicleId = 2;
+    double latitude = 3;
+    double longitude = 4;
+    string updatedAt = 5;
+}
+
+message VehicleLocationList{
+    repeated VehicleLocation vehicleLocations = 1;
+}
