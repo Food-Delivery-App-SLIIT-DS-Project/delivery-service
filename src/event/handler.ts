@@ -22,20 +22,21 @@ export class DeliveryKafkaHandler {
     console.log('📦 Received ORDER_ACCEPTED payload:', data);
 
     const location = data?.location;
-    const orderId = data?.orderId;
+    const order = data?.order;
+    console.log('📦 Received ORDER_ACCEPTED payload:', order);
 
     if (!location) {
       console.warn('❌ Invalid or missing location data:', data);
       return; // ⬅️ Don't crash! Just return to acknowledge the message
     }
 
-    const { lat, lng } = location;
+    const { latitude, longitude } = location;
     const radius = 500;
-
+    console.log(location)
     try {
       const nearbyDelivery = await this.deliveryService.findNearest(
-        lat,
-        lng,
+        latitude,
+        longitude,
         radius,
       );
 
@@ -46,18 +47,27 @@ export class DeliveryKafkaHandler {
       }
 
       const selectedRider = nearbyDelivery[0];
+
+      // get fcmToekn by userId
+      const fcmToken = await this.deliveryService.getFcmToken(
+        selectedRider.userId,
+      );
+      if (!fcmToken) {
+        console.warn('No FCM token found for the selected rider');
+        return;
+      }
+
       const dataFormate = {
         data: {
-          token:
-            'dfK2ZliHQE-GjkWeJWxXFh:APA91bEyyY8qHBLmtI188npTY-t5VSkyDi_oMTUsjjx0rx5cuqmjHk7_mvUr8Nmm6cY1XSr16zpiGrIyXj6ri1Rm8uLRZ-bL38L7teFoNrnJJIKexUz_PcU',
+          token: fcmToken,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          orderId: orderId,
-          customerName: 'Mash',
-          address: 'Kolonnawa',
-          total: '$7.50',
+          orderId: order.orderId,
+          total: order.totalPrice,
+          customerName: "Demo",
+          address: "DEmo",
           pickupLocation: {
-            lat: lat,
-            lng: lng,
+            lat: latitude,
+            lng: longitude,
           },
         },
       };

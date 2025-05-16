@@ -47,7 +47,7 @@ async function bootstrap() {
   });
 
   app.enableShutdownHooks();
-
+  await app.init();
   // Start both transports
   await app.startAllMicroservices();
   console.log('✅ gRPC and Kafka microservices running on Delivery Service');

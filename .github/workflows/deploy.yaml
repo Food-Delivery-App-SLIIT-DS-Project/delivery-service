@@ -1,0 +1,107 @@
+name: Deploy Delivery Service to K3s
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: mash02/delivery-service
+  IMAGE_TAG: latest
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Create delivery-service-deployment.yaml (with Service)
+        shell: bash
+        run: |
+          cat <<EOF > delivery-service-deployment.yaml
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: delivery-service
+            namespace: default
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: delivery-service
+            template:
+              metadata:
+                labels:
+                  app: delivery-service
+              spec:
+                containers:
+                - name: delivery-service
+                  image: ${IMAGE_NAME}:${IMAGE_TAG}
+                  ports:
+                  - containerPort: 50053
+                  envFrom:
+                  - secretRef:
+                      name: delivery-service-secret
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: delivery-service
+            namespace: default
+          spec:
+            selector:
+              app: delivery-service
+            ports:
+              - protocol: TCP
+                port: 50053
+                targetPort: 50053
+            type: ClusterIP
+          EOF
+
+      - name: Write delivery-service-secret.yaml from GitHub Secret
+        run: |
+          echo "${{ secrets.DELIVERY_SERVICE_SECRET_YAML_BASE64 }}" | base64 -d > delivery-service-secret.yaml
+
+      - name: Check if files exist
+        run: |
+          ls -la
+          echo "delivery-service-deployment.yaml:" && cat delivery-service-deployment.yaml
+          echo "delivery-service-secret.yaml:" && cat delivery-service-secret.yaml || echo "Missing secret file"
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+          docker push $IMAGE_NAME:$IMAGE_TAG
+
+      - name: Install OpenSSH client
+        run: sudo apt-get update && sudo apt-get install -y openssh-client
+
+      - name: Set up SSH key (RSA)
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Test SSH connection
+        run: ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'echo "SSH connection successful"'
+
+      - name: Deploy to EC2
+        run: |
+          ssh ubuntu@${{ secrets.EC2_HOST }} "mkdir -p ~/deploy/delivery-service"
+          scp delivery-service-*.yaml ubuntu@${{ secrets.EC2_HOST }}:~/deploy/delivery-service/
+          ssh ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+            cd ~/deploy/delivery-service
+            sudo kubectl apply -f delivery-service-secret.yaml
+            sudo kubectl apply -f delivery-service-deployment.yaml
+          EOF
