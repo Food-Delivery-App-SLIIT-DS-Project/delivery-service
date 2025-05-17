@@ -1,7 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: delivery-service
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: delivery-service
+  namespace: delivery-service
   labels:
     app: delivery-service
 spec:
@@ -24,14 +30,15 @@ spec:
                 name: delivery-service-secret
           env:
             - name: REDIS_HOST
-              value: redis  #  namespace 
+              value: redis #  namespace
             - name: REDIS_PORT
-              value: "6379"
+              value: '6379'
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: delivery-service
+  namespace: delivery-service
 spec:
   selector:
     app: delivery-service
