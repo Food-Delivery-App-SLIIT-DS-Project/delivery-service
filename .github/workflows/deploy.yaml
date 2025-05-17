@@ -33,7 +33,7 @@ jobs:
           kind: Deployment
           metadata:
             name: delivery-service
-            namespace: default
+            namespace: delivery-service
           spec:
             replicas: 1
             selector:
@@ -57,7 +57,7 @@ jobs:
           kind: Service
           metadata:
             name: delivery-service
-            namespace: default
+            namespace: delivery-service
           spec:
             selector:
               app: delivery-service
