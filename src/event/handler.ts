@@ -33,7 +33,7 @@ export class DeliveryKafkaHandler {
 
     const { latitude, longitude } = location;
     const radius = 5000;
-    console.log(location)
+    console.log(location);
     try {
       const nearbyDelivery = await this.deliveryService.findNearest(
         latitude,
@@ -57,7 +57,9 @@ export class DeliveryKafkaHandler {
         console.warn('No FCM token found for the selected rider');
         return;
       }
-      const customer = await this.deliveryService.getCustomerById(order.customerId);
+      const customer = await this.deliveryService.getCustomerById(
+        order.customerId,
+      );
       if (!customer) {
         console.warn('No customer found for the order');
         return;
@@ -70,10 +72,10 @@ export class DeliveryKafkaHandler {
           orderId: order.orderId,
           total: order.totalPrice,
           customerName: customer.fullName,
-          customerMobile : customer.phoneNumber,
+          customerMobile: customer.phoneNumber,
           pickupLocation: {
-            lat: latitude,
-            lng: longitude,
+            lat: order.customerLocation.latitude,
+            lng: order.customerLocation.longitude,
           },
           dropoffLocation: {
             lat: order.customerLocation.latitude,
