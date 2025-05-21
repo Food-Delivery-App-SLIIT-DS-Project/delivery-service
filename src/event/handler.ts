@@ -65,26 +65,26 @@ export class DeliveryKafkaHandler {
         return;
       }
 
-      const dataFormate = {
+      const dataFormat = {
         data: {
           token: fcmToken,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           orderId: order.orderId,
           total: order.totalPrice,
           customerName: customer.fullName,
           customerMobile: customer.phoneNumber,
           pickupLocation: {
-            lat: order.latitude,
-            lng: order.longitude,
+            lat: order.locationInfo.latitude,
+            lng: order.locationInfo.longitude,
           },
           dropoffLocation: {
-            lat: order.latitude,
-            lng: order.longitude,
+            lat: order.locationInfo.latitude,
+            lng: order.locationInfo.longitude,
           },
         },
       };
-      console.log('🚚 Sending delivery assignment: ----------', dataFormate);
-      await this.kafkaClient.emit('DELIVERY_ASSIGNED', dataFormate);
+
+      console.log('🚚 Sending delivery assignment: ----------', dataFormat);
+      await this.kafkaClient.emit('DELIVERY_ASSIGNED', dataFormat);
     } catch (err) {
       console.error('🚨 Failed to handle order accepted:', err);
       // Optionally rethrow: throw err
