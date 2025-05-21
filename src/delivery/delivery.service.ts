@@ -18,6 +18,7 @@ import {
 import {
   FcmTokenResponse,
   USER_SERVICE_NAME,
+  UserResponse,
   UserServiceClient,
 } from 'src/types/user';
 
@@ -33,7 +34,8 @@ export class DeliveryService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    this.userServiceClient = this.client.getService<UserServiceClient>(USER_SERVICE_NAME);
+    this.userServiceClient =
+      this.client.getService<UserServiceClient>(USER_SERVICE_NAME);
   }
   // get fcm token
   async getFcmToken(userId: string) {
@@ -42,7 +44,7 @@ export class DeliveryService implements OnModuleInit {
     // eslint-disable-next-line no-useless-catch
     try {
       const fcmTokenResponse: FcmTokenResponse = await lastValueFrom(
-        this.userServiceClient.findFcmTokenByUserId( {userId} ),
+        this.userServiceClient.findFcmTokenByUserId({ userId }),
       );
 
       if (!fcmTokenResponse) {
@@ -171,7 +173,7 @@ export class DeliveryService implements OnModuleInit {
   }
 
   // Find nearest delivery persons within radius
-  async findNearest(lat: number, lng: number, maxDistanceInMeters = 5000) {
+  async findNearest(lat: number, lng: number, maxDistanceInMeters = 50000) {
     this.validateCoordinates([lng, lat]);
     console.log(
       'Finding nearest delivery persons:',
@@ -200,6 +202,22 @@ export class DeliveryService implements OnModuleInit {
       throw new InternalServerErrorException(
         'Failed to find nearby delivery persons',
       );
+    }
+  }
+
+  // Get customer ------------
+  async getCustomerById(customerId: string) {
+    try {
+      const customer: UserResponse = await lastValueFrom(
+        this.userServiceClient.findUserById({ userId: customerId }),
+      );
+
+      if (!customer) {
+        throw new NotFoundException('Customer not found');
+      }
+      return customer;
+    } catch (error) {
+      console.log('Error fetching customer:', error);
     }
   }
 }

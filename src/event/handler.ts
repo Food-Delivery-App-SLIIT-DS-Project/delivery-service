@@ -23,6 +23,7 @@ export class DeliveryKafkaHandler {
 
     const location = data?.location;
     const order = data?.order;
+    const restaurantId = data?.restaurantId;
     console.log('📦 Received ORDER_ACCEPTED payload:', order);
 
     if (!location) {
@@ -31,7 +32,7 @@ export class DeliveryKafkaHandler {
     }
 
     const { latitude, longitude } = location;
-    const radius = 500;
+    const radius = 5000;
     console.log(location)
     try {
       const nearbyDelivery = await this.deliveryService.findNearest(
@@ -56,6 +57,11 @@ export class DeliveryKafkaHandler {
         console.warn('No FCM token found for the selected rider');
         return;
       }
+      const customer = await this.deliveryService.getCustomerById(order.customerId);
+      if (!customer) {
+        console.warn('No customer found for the order');
+        return;
+      }
 
       const dataFormate = {
         data: {
@@ -63,11 +69,15 @@ export class DeliveryKafkaHandler {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           orderId: order.orderId,
           total: order.totalPrice,
-          customerName: "Demo",
-          address: "DEmo",
+          customerName: customer.fullName,
+          customerMobile : customer.phoneNumber,
           pickupLocation: {
             lat: latitude,
             lng: longitude,
+          },
+          dropoffLocation: {
+            lat: order.customerLocation.latitude,
+            lng: order.customerLocation.longitude,
           },
         },
       };

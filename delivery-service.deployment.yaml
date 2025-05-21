@@ -30,7 +30,7 @@ spec:
                 name: delivery-service-secret
           env:
             - name: REDIS_HOST
-              value: redis #  namespace
+              value: 'redis.redis.svc.cluster.local' #  namespace
             - name: REDIS_PORT
               value: '6379'
 ---
