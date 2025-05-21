@@ -83,6 +83,7 @@ export class DeliveryKafkaHandler {
           },
         },
       };
+      console.log('🚚 Sending delivery assignment: ----------', dataFormate);
       await this.kafkaClient.emit('DELIVERY_ASSIGNED', dataFormate);
     } catch (err) {
       console.error('🚨 Failed to handle order accepted:', err);
