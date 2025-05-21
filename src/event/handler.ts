@@ -25,8 +25,8 @@ export class DeliveryKafkaHandler {
     const order = data?.order;
     const restaurantId = data?.restaurantId;
     console.log('📦 Received ORDER_ACCEPTED payload:', order);
-    console.log('loction info-----------------', data?.order.locationInfo);
-    console.log('loction info-----------------', data?.order.latitude);
+    console.log('loction info 1-----------------', location.latitude);
+    console.log('loction info 2-----------------', data?.locationInfo);
 
     if (!location) {
       console.warn('❌ Invalid or missing location data:', data);
@@ -75,12 +75,12 @@ export class DeliveryKafkaHandler {
           customerName: customer.fullName,
           customerMobile: customer.phoneNumber,
           pickupLocation: {
-            lat: latitude,
-            lng: longitude,
+            lat: location.latitude ?? 0,
+            lng: location.longitude ?? 0,
           },
           dropoffLocation: {
-            lat: order.locationInfo.latitude,
-            lng: order.locationInfo.longitude,
+            lat: data.locationInfo.latitude,
+            lng: data.locationInfo.longitude,
           },
         },
       };
