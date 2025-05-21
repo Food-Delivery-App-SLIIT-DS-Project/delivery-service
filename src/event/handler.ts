@@ -79,8 +79,8 @@ export class DeliveryKafkaHandler {
             lng: location.longitude ?? 0,
           },
           dropoffLocation: {
-            lat: data.locationInfo.latitude,
-            lng: data.locationInfo.longitude,
+            lat: data.latitude ?? 0,
+            lng: data.longitude ?? 0,
           },
         },
       };
