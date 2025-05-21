@@ -74,12 +74,12 @@ export class DeliveryKafkaHandler {
           customerName: customer.fullName,
           customerMobile: customer.phoneNumber,
           pickupLocation: {
-            lat: order.customerLocation.latitude,
-            lng: order.customerLocation.longitude,
+            lat: order.latitude,
+            lng: order.longitude,
           },
           dropoffLocation: {
-            lat: order.customerLocation.latitude,
-            lng: order.customerLocation.longitude,
+            lat: order.latitude,
+            lng: order.longitude,
           },
         },
       };
